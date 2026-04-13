@@ -34,11 +34,12 @@ body::before {
 
 .hero {
   width: 100%;
-  background: rgba(0, 0, 0, 0.35);
-  border-bottom: 1px solid #1f1f1f;
+  background: transparent;
+  border-bottom: 0;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 8px 0;
 }
 
 .hero__media {
@@ -46,6 +47,7 @@ body::before {
   width: 4cm;
   height: 4cm;
   object-fit: cover;
+  mix-blend-mode: screen;
 }
 
 .content {
