@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spinlist • Выбор ника</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <video class="background-video" autoplay loop muted playsinline preload="auto">
+      <source src="assets/BG.mp4" type="video/mp4" />
+    </video>
+
+    <header class="hero">
+      <video class="hero__media" autoplay loop muted playsinline preload="auto">
+        <source src="assets/header.webm" type="video/webm" />
+      </video>
+    </header>
+
+    <main class="content">
+      <section class="auth-card" aria-label="Выбор ника">
+        <h1>Выбери ник</h1>
+
+        <p class="auth-helper">После отправки заявки дождись ручной верификации.</p>
+
+        <div id="nicknameFormBlock">
+          <label class="auth-label" for="nickname">Ник</label>
+          <input id="nickname" class="auth-input" type="text" placeholder="Введите ник" maxlength="32" />
+          <button id="submitNicknameButton" class="auth-button" type="button">Отправить</button>
+        </div>
+
+        <div id="nicknameSubmittedBlock" class="hidden">
+          <p class="auth-label">Отправленный ник</p>
+          <p id="submittedNickname" class="auth-static"></p>
+          <p class="auth-message">Отправлено, ожидайте верификации.</p>
+        </div>
+
+        <p id="nicknameError" class="auth-error" role="alert" aria-live="polite"></p>
+
+        <button id="logoutButton" class="auth-button auth-button--secondary" type="button">Выйти на вход</button>
+      </section>
+    </main>
+
+    <script type="module" src="nickname.js"></script>
+  </body>
+</html>

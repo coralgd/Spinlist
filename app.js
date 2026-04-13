@@ -2,8 +2,16 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/fireba
 import {
   createUserWithEmailAndPassword,
   getAuth,
+  onAuthStateChanged,
   signInWithEmailAndPassword
 } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+import {
+  doc,
+  getDoc,
+  getFirestore,
+  serverTimestamp,
+  setDoc
+} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 import { firebaseConfig } from './firebase-config.js';
 
 const emailInput = document.querySelector('#email');
@@ -15,6 +23,7 @@ const authMessage = document.querySelector('#authMessage');
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 const clearStatus = () => {
   authError.textContent = '';
@@ -36,7 +45,7 @@ const getCredentials = () => {
   const password = passwordInput.value.trim();
 
   if (!email || !password) {
-    showError('сначала введи данные');
+    showError('Сначала введи почту и пароль');
     return null;
   }
 
@@ -46,6 +55,41 @@ const getCredentials = () => {
 const setButtonsDisabled = (isDisabled) => {
   loginButton.disabled = isDisabled;
   registerButton.disabled = isDisabled;
+};
+
+const ensureUserDocument = async ({ uid, email }) => {
+  const userRef = doc(db, 'users', uid);
+  const snapshot = await getDoc(userRef);
+
+  if (snapshot.exists()) {
+    return;
+  }
+
+  await setDoc(userRef, {
+    email,
+    nickname: '',
+    position: 'requested',
+    createdAt: serverTimestamp()
+  });
+};
+
+const openNextPageForUser = async (userId) => {
+  const userRef = doc(db, 'users', userId);
+  const userSnapshot = await getDoc(userRef);
+
+  if (!userSnapshot.exists()) {
+    location.href = './nickname.html';
+    return;
+  }
+
+  const userData = userSnapshot.data();
+
+  if (userData.position === 'verified') {
+    location.href = './main.html';
+    return;
+  }
+
+  location.href = './nickname.html';
 };
 
 registerButton.addEventListener('click', async () => {
@@ -58,8 +102,15 @@ registerButton.addEventListener('click', async () => {
 
   try {
     setButtonsDisabled(true);
-    await createUserWithEmailAndPassword(auth, credentials.email, credentials.password);
-    showMessage('Регистрация прошла успешно');
+    const credential = await createUserWithEmailAndPassword(auth, credentials.email, credentials.password);
+
+    await ensureUserDocument({
+      uid: credential.user.uid,
+      email: credentials.email
+    });
+
+    showMessage('Регистрация прошла успешно. Переход на страницу ника...');
+    await openNextPageForUser(credential.user.uid);
   } catch (error) {
     showError(error.message);
   } finally {
@@ -77,11 +128,35 @@ loginButton.addEventListener('click', async () => {
 
   try {
     setButtonsDisabled(true);
-    await signInWithEmailAndPassword(auth, credentials.email, credentials.password);
+    const credential = await signInWithEmailAndPassword(auth, credentials.email, credentials.password);
+
+    await ensureUserDocument({
+      uid: credential.user.uid,
+      email: credential.user.email ?? credentials.email
+    });
+
     showMessage('Вход выполнен успешно');
+    await openNextPageForUser(credential.user.uid);
   } catch (error) {
     showError(error.message);
   } finally {
     setButtonsDisabled(false);
+  }
+});
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    return;
+  }
+
+  try {
+    await ensureUserDocument({
+      uid: user.uid,
+      email: user.email ?? ''
+    });
+
+    await openNextPageForUser(user.uid);
+  } catch (error) {
+    showError(`Ошибка доступа к профилю: ${error.message}`);
   }
 });
