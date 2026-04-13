@@ -21,8 +21,9 @@ body {
 
 .hero__media {
   display: block;
-  width: 2cm;
-  height: 2cm;
+  width: 3cm;
+  height: 3cm;
+  margin: 0 auto;
   object-fit: cover;
 }
 
