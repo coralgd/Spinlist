@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
-import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
 import {
   doc,
   getDoc,
@@ -15,6 +15,7 @@ const nicknameError = document.querySelector('#nicknameError');
 const nicknameFormBlock = document.querySelector('#nicknameFormBlock');
 const nicknameSubmittedBlock = document.querySelector('#nicknameSubmittedBlock');
 const submittedNickname = document.querySelector('#submittedNickname');
+const logoutButton = document.querySelector('#logoutButton');
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -94,6 +95,21 @@ submitNicknameButton.addEventListener('click', async () => {
     showError(error.message);
   } finally {
     submitNicknameButton.disabled = false;
+  }
+});
+
+
+logoutButton.addEventListener('click', async () => {
+  clearError();
+
+  try {
+    logoutButton.disabled = true;
+    await signOut(auth);
+    location.href = './index.html';
+  } catch (error) {
+    showError(error.message);
+  } finally {
+    logoutButton.disabled = false;
   }
 });
 
