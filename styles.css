@@ -47,6 +47,7 @@ body {
   width: 4cm;
   height: 4cm;
   object-fit: cover;
+  mix-blend-mode: screen;
 }
 
 .content {
