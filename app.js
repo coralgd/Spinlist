@@ -57,6 +57,22 @@ const setButtonsDisabled = (isDisabled) => {
   registerButton.disabled = isDisabled;
 };
 
+const ensureUserDocument = async ({ uid, email }) => {
+  const userRef = doc(db, 'users', uid);
+  const snapshot = await getDoc(userRef);
+
+  if (snapshot.exists()) {
+    return;
+  }
+
+  await setDoc(userRef, {
+    email,
+    nickname: '',
+    position: 'requested',
+    createdAt: serverTimestamp()
+  });
+};
+
 const openNextPageForUser = async (userId) => {
   const userRef = doc(db, 'users', userId);
   const userSnapshot = await getDoc(userRef);
@@ -88,11 +104,9 @@ registerButton.addEventListener('click', async () => {
     setButtonsDisabled(true);
     const credential = await createUserWithEmailAndPassword(auth, credentials.email, credentials.password);
 
-    await setDoc(doc(db, 'users', credential.user.uid), {
-      email: credentials.email,
-      nickname: '',
-      position: 'requested',
-      createdAt: serverTimestamp()
+    await ensureUserDocument({
+      uid: credential.user.uid,
+      email: credentials.email
     });
 
     showMessage('Регистрация прошла успешно. Переход на страницу ника...');
@@ -115,6 +129,12 @@ loginButton.addEventListener('click', async () => {
   try {
     setButtonsDisabled(true);
     const credential = await signInWithEmailAndPassword(auth, credentials.email, credentials.password);
+
+    await ensureUserDocument({
+      uid: credential.user.uid,
+      email: credential.user.email ?? credentials.email
+    });
+
     showMessage('Вход выполнен успешно');
     await openNextPageForUser(credential.user.uid);
   } catch (error) {
@@ -129,5 +149,14 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  await openNextPageForUser(user.uid);
+  try {
+    await ensureUserDocument({
+      uid: user.uid,
+      email: user.email ?? ''
+    });
+
+    await openNextPageForUser(user.uid);
+  } catch (error) {
+    showError(`Ошибка доступа к профилю: ${error.message}`);
+  }
 });
