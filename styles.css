@@ -17,13 +17,15 @@ body {
   width: 100%;
   background: #000;
   border-bottom: 1px solid #1f1f1f;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .hero__media {
   display: block;
-  width: 3cm;
-  height: 3cm;
-  margin: 0 auto;
+  width: 4cm;
+  height: 4cm;
   object-fit: cover;
 }
 
