@@ -1,9 +1,8 @@
-// Вставь сюда конфиг Firebase из Project Settings -> General -> Your apps -> SDK setup and configuration
 export const firebaseConfig = {
-  apiKey: 'PASTE_API_KEY_HERE',
-  authDomain: 'PASTE_AUTH_DOMAIN_HERE',
-  projectId: 'PASTE_PROJECT_ID_HERE',
-  storageBucket: 'PASTE_STORAGE_BUCKET_HERE',
-  messagingSenderId: 'PASTE_MESSAGING_SENDER_ID_HERE',
-  appId: 'PASTE_APP_ID_HERE'
+  apiKey: 'AIzaSyD0Yfa5O8WyH1A_qTAeJzWYSKifCcXPYXQ',
+  authDomain: 'spinnakerlist.firebaseapp.com',
+  projectId: 'spinnakerlist',
+  storageBucket: 'spinnakerlist.firebasestorage.app',
+  messagingSenderId: '578093308848',
+  appId: '1:578093308848:web:5307db37ddb8094b735475'
 };

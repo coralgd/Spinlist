@@ -4,6 +4,14 @@ import {
   getAuth,
   signInWithEmailAndPassword
 } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+import {
+  doc,
+  getDoc,
+  getFirestore,
+  serverTimestamp,
+  setDoc,
+  updateDoc
+} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 import { firebaseConfig } from './firebase-config.js';
 
 const emailInput = document.querySelector('#email');
@@ -15,6 +23,7 @@ const authMessage = document.querySelector('#authMessage');
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 const clearStatus = () => {
   authError.textContent = '';
@@ -48,6 +57,38 @@ const setButtonsDisabled = (isDisabled) => {
   registerButton.disabled = isDisabled;
 };
 
+const upsertUserDocument = async (user, isNewUser = false) => {
+  const userRef = doc(db, 'users', user.uid);
+
+  if (isNewUser) {
+    await setDoc(userRef, {
+      uid: user.uid,
+      email: user.email,
+      // Пароль в Firestore не сохраняем: Firebase Auth хранит его безопасно в хешированном виде.
+      createdAt: serverTimestamp(),
+      lastLoginAt: serverTimestamp()
+    });
+    return;
+  }
+
+  const userSnapshot = await getDoc(userRef);
+
+  if (!userSnapshot.exists()) {
+    await setDoc(userRef, {
+      uid: user.uid,
+      email: user.email,
+      createdAt: serverTimestamp(),
+      lastLoginAt: serverTimestamp()
+    });
+    return;
+  }
+
+  await updateDoc(userRef, {
+    email: user.email,
+    lastLoginAt: serverTimestamp()
+  });
+};
+
 registerButton.addEventListener('click', async () => {
   clearStatus();
   const credentials = getCredentials();
@@ -58,7 +99,8 @@ registerButton.addEventListener('click', async () => {
 
   try {
     setButtonsDisabled(true);
-    await createUserWithEmailAndPassword(auth, credentials.email, credentials.password);
+    const userCredential = await createUserWithEmailAndPassword(auth, credentials.email, credentials.password);
+    await upsertUserDocument(userCredential.user, true);
     showMessage('Регистрация прошла успешно');
   } catch (error) {
     showError(error.message);
@@ -77,7 +119,8 @@ loginButton.addEventListener('click', async () => {
 
   try {
     setButtonsDisabled(true);
-    await signInWithEmailAndPassword(auth, credentials.email, credentials.password);
+    const userCredential = await signInWithEmailAndPassword(auth, credentials.email, credentials.password);
+    await upsertUserDocument(userCredential.user);
     showMessage('Вход выполнен успешно');
   } catch (error) {
     showError(error.message);
