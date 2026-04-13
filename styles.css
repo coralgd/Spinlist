@@ -38,8 +38,12 @@ body {
   justify-content: center;
   align-items: center;
   padding: 8px 0;
-  position: relative;
-  z-index: 3;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  pointer-events: none;
+  isolation: isolate;
 }
 
 .hero__media {
@@ -49,13 +53,12 @@ body {
   object-fit: cover;
   mix-blend-mode: screen;
   background: transparent;
-  isolation: isolate;
 }
 
 .content {
   max-width: 960px;
   margin: 0 auto;
-  padding: 24px 16px;
+  padding: calc(4cm + 24px) 16px 24px;
   position: relative;
   z-index: 2;
 }
