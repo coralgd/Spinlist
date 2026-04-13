@@ -18,8 +18,25 @@
     </header>
 
     <main class="content">
-      <h1>Spinlist</h1>
-      <p>Главная страница для публикации через GitHub Pages.</p>
+      <section class="auth-card" aria-label="Вход и регистрация">
+        <h1>Вход в аккаунт</h1>
+
+        <label class="auth-label" for="email">Email</label>
+        <input id="email" class="auth-input" type="email" placeholder="you@example.com" autocomplete="email" />
+
+        <label class="auth-label" for="password">Пароль</label>
+        <input id="password" class="auth-input" type="password" placeholder="Введите пароль" autocomplete="current-password" />
+
+        <div class="auth-actions">
+          <button id="loginButton" class="auth-button" type="button">Войти</button>
+          <button id="registerButton" class="auth-button auth-button--secondary" type="button">Регистрация</button>
+        </div>
+
+        <p id="authError" class="auth-error" role="alert" aria-live="polite"></p>
+        <p id="authMessage" class="auth-message" aria-live="polite"></p>
+      </section>
     </main>
+
+    <script type="module" src="app.js"></script>
   </body>
 </html>
